@@ -264,8 +264,12 @@ start_run <- function(cfg, scenario = NULL, codeCheck = TRUE, lock_model = TRUE)
   if (is.null(renv::project())) {
     message("No active renv project found, not using renv.")
   } else {
-    # this script always runs in repo root, so we can check whether the main renv is loaded with:
-    if (normalizePath(renv::project()) == normalizePath(".")) {
+    if (!is.null(cfg$renv_lock)) {
+      message("Copying cfg$renv_lock (= '", normalizePath(cfg$renv_lock, mustWork = TRUE), "') into '",
+              cfg$results_folder, "'")
+      file.copy(cfg$renv_lock, file.path(cfg$results_folder, "_renv.lock"))
+    } else if (normalizePath(renv::project()) == normalizePath(".")) {
+      # the main renv is loaded
       message("Generating lockfile in '", cfg$results_folder, "'... ", appendLF = FALSE)
       # suppress output of renv::snapshot
       utils::capture.output({
